@@ -1,0 +1,169 @@
+# Data from:
+#https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE169473
+#Yamada K, Mine A. Sugar coordinates plant defense signaling. Sci Adv 2024
+
+# Load required libraries
+
+library(GEOquery)
+library(DESeq2)
+library(tidyverse)
+library(stringr)
+library(pheatmap)
+library(limma)
+library(KEGGREST)
+library(org.At.tair.db)
+library(clusterProfiler)
+library(AnnotationDbi)
+
+# Set working directory
+setwd("Your_Path")
+
+
+data <- getGEO("GSE169473",AnnotGPL = TRUE)
+data  <- data$GSE169473_series_matrix.txt.gz
+pData(data)[,c("genotype:ch1","replicate:ch1","time:ch1","treatment:ch1")]
+pData(data)[,"time:ch1"]
+
+# Load and organize count tables
+count_matix_ky <- read.table("GSE169473_count_table_KY01_KY30.txt")
+nuevo_orden <- c("Col_flg22_10h_1","stp1.4.13_flg22_10h_1","fls2_flg22_10h_1",
+                 "Col_flg22_10h_2","stp1.4.13_flg22_10h_2","fls2_flg22_10h_2",
+                 "Col_flg22_10h_3","stp1.4.13_flg22_10h_3","fls2_flg22_10h_3",
+                 "Col_Suc_0mM_24h_1","Col_Suc_25mM_24h_1","Col_2DG_1mM_24h_1",
+                 "Col_Suc_0mM_24h_2","Col_Suc_25mM_24h_2","Col_2DG_1mM_24h_2",
+                 "Col_Suc_0mM_24h_3","Col_Suc_25mM_24h_3","Col_2DG_1mM_24h_3")
+
+count_matix_ky <- count_matix_ky %>% 
+  select(nuevo_orden)
+
+count_matix_lib <- read.table("GSE169473_count_table_Lib01_Lib18.txt")
+
+nuevo_orden <- c("Col_flg22_2h_1","stp1.4.13_flg22_2h_1","fls2_flg22_2h_1",
+                 "Col_flg22_24h_1","stp1.4.13_flg22_24h_1","fls2_flg22_24h_1",
+                 "Col_flg22_2h_2","stp1.4.13_flg22_2h_2","fls2_flg22_2h_2",
+                 "Col_flg22_24h_2","stp1.4.13_flg22_24h_2","fls2_flg22_24h_2",
+                 "Col_flg22_2h_3","stp1.4.13_flg22_2h_3","fls2_flg22_2h_3",
+                 "Col_flg22_24h_3","stp1.4.13_flg22_24h_3","fls2_flg22_24h_3")
+count_matix_lib <- count_matix_lib %>% 
+  select(nuevo_orden)
+
+
+count_table <- cbind(count_matix_lib,count_matix_ky)
+
+colnames(count_table) <- rownames(pData(data))  
+col.data <- pData(data)[,c("genotype:ch1","replicate:ch1","time:ch1","treatment:ch1")]
+colnames(col.data) <- c("genotype","rep","time","treatment")
+col.data$genotype <- gsub("/","",col.data$genotype)
+col.data$rep <- gsub("#","",col.data$rep)
+
+# Filter treatment condition and create DESeq object
+col.data1 <- col.data %>% 
+  filter(treatment != "flg22") 
+col_selec <- rownames(col.data1)
+col.data1$rep <- as.factor(col.data1$rep)
+col.data1$treatment <- as.factor(col.data1$treatment)
+count_table1 <- count_table[,col_selec]
+
+dds <-DESeqDataSetFromMatrix(count_table1,colData = col.data1, design = ~ treatment + rep)
+levels(dds$treatment) <-  relevel(dds$treatment, "Suc_0mM")
+
+# Perform DE analysis
+dds <- DESeq(dds)
+resultados <- results(dds)
+genes_up <- subset(resultados, padj < 0.05 & log2FoldChange > 2)
+cat("Genes upregulated:", nrow(genes_up), "\n")
+
+
+genes_down <- subset(resultados, padj < 0.05 & log2FoldChange < 2)
+cat("Genes downregulated:", nrow(genes_down), "\n")
+
+# Perform PCA analysis
+rld <- rlog(dds)
+data_pca <- plotPCA(rld, intgroup = c("treatment","rep"))
+data_pca 
+plot(hclust(dist(t(assay(rld)))), labels = colData(dds)$treatment)
+
+dds <-DESeqDataSetFromMatrix(count_table1,colData = col.data1, design = ~ treatment)
+levels(dds$treatment) <-  relevel(dds$treatment, "Suc_0mM")
+dds <- DESeq(dds)
+res <- results(dds)
+
+res_treshold <- results(dds, lfcThreshold  = 2)
+DESeq2::plotMA(res_treshold, ylim = c(-15,15), )
+
+# Gene Ontology enrichment analysis
+
+coef_names <- resultsNames(dds)
+
+mArrayLM <- lfcShrink(dds, coef="treatment_Suc_25mM_vs_Suc_0mM", type="normal",)
+
+filtered_genes <- subset(mArrayLM, padj < 0.05 & abs(log2FoldChange) > 1)
+gene_ids <- rownames(filtered_genes)
+entrez_ids <- bitr(gene_ids, fromType = "TAIR", toType = "ENTREZID", OrgDb = org.At.tair.db,drop = F)
+
+go_enrichment <- enrichGO(gene = entrez_ids$ENTREZID,
+                          OrgDb = org.At.tair.db,
+                          ont = c("ALL"), 
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.2)
+
+
+df_go_enrichment <- as.data.frame(go_enrichment)
+
+#BiocManager::install("GOplot")
+#https://cran.r-project.org/web/packages/GOplot/vignettes/GOplot_vignette.html
+library(GOplot)
+data(EC)
+
+df_go_enrichment <- df_go_enrichment %>% 
+  select(ONTOLOGY,
+         ID,
+         Description,
+         geneID,
+         p.adjust)
+
+colnames(df_go_enrichment) <- c("Category","ID","Term","Genes","adj_pval")
+mArrayLM_df <- as.data.frame(filtered_genes)
+
+mArrayLM_df <- mArrayLM_df %>% 
+  mutate(ID = entrez_ids$ENTREZID)
+rownames(mArrayLM_df) <- c(1:nrow(mArrayLM_df))
+
+mArrayLM_df <- mArrayLM_df %>% 
+  select(ID,
+         log2FoldChange,
+         lfcSE,
+         stat,
+         pvalue,
+         padj,
+         baseMean)
+
+df_go_enrichment$Genes <- gsub("/", ", ", df_go_enrichment$Genes)
+colnames(mArrayLM_df) <- colnames(EC$genelist)
+
+circ <- circle_dat(df_go_enrichment, mArrayLM_df)
+reduced_circ <- reduce_overlap(circ, overlap = 0.75)
+
+# Generate circle plot
+
+subset_BP <- filter(reduced_circ, category == "BP")[1:10, ]
+subset_CC <- filter(reduced_circ, category == "CC")[1:10, ]
+subset_MF <- filter(reduced_circ, category == "MF")[1:10, ]
+final_subset <- rbind(subset_BP, subset_CC, subset_MF)
+
+GOBubble(final_subset, labels = 10)
+
+# Heatmap 
+
+colnames(df_go_enrichment)
+genes_photo <- df_go_enrichment[1,"geneID"]
+genes_photo <- unlist(strsplit(genes_photo, "/"))
+genes_photo_tair <- bitr(genes_photo, fromType = "ENTREZID", toType = "TAIR", OrgDb = org.At.tair.db,drop = F)
+
+matriz <- assay(rld)[rownames(rld)%in% genes_photo_tair$TAIR, ]
+matriz <- matriz - rowMeans(matriz)
+matriz
+
+df <-  as.data.frame(colData(rld)[,c("treatment","rep")])
+
+pheatmap(matriz,annotation_col = df)
