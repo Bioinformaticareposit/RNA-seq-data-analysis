@@ -31,3 +31,6 @@ In pursuit of deciphering the complex tapestry of gene expression dynamics and m
 ![PCA](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/b7e1a8bd-6f49-4bab-8e90-dde791edee4f)
 ![plotMA](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/2e44b42d-beca-49f5-96e0-7e6d769b028f)
 
+Following the DESeq analysis, we proceed with log-fold change shrinkage using lfcShrink for the specific comparison between plants treated with or without Sucrose conditions. Subsequently, genes are filtered based on significance and magnitude criteria (padj < 0.05 and |log2FoldChange| > 1). Finally, a Gene Ontology (GO) enrichment analysis is conducted, unveiling the biological processes, molecular functions, and cellular components associated with the differentially expressed genes.
+![GO_analysis](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/4e616c65-fea4-4496-bb9b-56827f68aefb)
+
