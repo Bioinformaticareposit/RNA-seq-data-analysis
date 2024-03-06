@@ -27,5 +27,7 @@ For specific details about the analysis and its interpretation, refer to the mai
 
 # Results
 
-In pursuit of deciphering the complex tapestry of gene expression dynamics and metabolic pathway adaptations in response to sucrose addition, we executed a DESeq analysis on Col-0 genotype plants. This comprehensive investigation compared plants under non-sugar addition conditions with those treated with sucrose, each condition having three replicates. Out of a total of 32,833 genes examined, approximately 19% (6,263 genes) exhibited up-regulation, while around 14% (4,582 genes) displayed down-regulation. As a quality control measure, a Principal Component Analysis (PCA) was employed, revealing a distinct clustering pattern among replicates of the same treatments. 
+In pursuit of deciphering the complex tapestry of gene expression dynamics and metabolic pathway adaptations in response to sucrose addition, we executed a DESeq analysis on Col-0 genotype plants. This comprehensive investigation compared plants under non-sugar addition conditions with those treated with sucrose, each condition having three replicates. Out of a total of 32,833 genes examined, approximately 12% (4135 genes) exhibited up-regulation, while around 20% (6710 genes) displayed down-regulation. As a quality control measure, a Principal Component Analysis (PCA) was employed, revealing a distinct clustering pattern among replicates of the same treatments. 
 ![PCA](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/b7e1a8bd-6f49-4bab-8e90-dde791edee4f)
+![plotMA](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/2e44b42d-beca-49f5-96e0-7e6d769b028f)
+
