@@ -34,3 +34,5 @@ In pursuit of deciphering the complex tapestry of gene expression dynamics and m
 Following the DESeq analysis, we proceed with log-fold change shrinkage using lfcShrink for the specific comparison between plants treated with or without Sucrose conditions. Subsequently, genes are filtered based on significance and magnitude criteria (padj < 0.05 and |log2FoldChange| > 1). Finally, a Gene Ontology (GO) enrichment analysis is conducted, unveiling the biological processes, molecular functions, and cellular components associated with the differentially expressed genes.
 ![GO_analysis](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/4e616c65-fea4-4496-bb9b-56827f68aefb)
 
+Among the Gene Ontology groups, GO:0015979, associated with photosynthesis, stands out as particularly impacted, featuring a substantial alteration in 163 genes. A heatmap visualization distinctly reveals a prevalent downregulation trend among a significant proportion of these genes.
+![heatmap photosyn](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/ac79bbea-430b-4dc7-885c-f42722a5793a)
