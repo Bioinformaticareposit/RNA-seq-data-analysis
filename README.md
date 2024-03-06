@@ -2,7 +2,7 @@
 This repository contains R scripts used to perform differential gene expression analysis in RNA-seq data. The dataset used comes from the study "Sugar coordinates plant defense signaling" (Yamada K, Mine A, Sci Adv 2024) and is available in the Gene Expression Omnibus (GEO) repository with the accession code GSE169473.
 
 # Analysis Objective
-The main objective of this analysis is to identify genes whose expression is modulated in response to sugar administration in plants. Different treatments and exposure times are explored to understand how defense signaling in plants is coordinated by the presence of sugars.
+The main objective of this analysis is to identify genes whose expression is modulated in response to sugar administration in plants. Different treatments and exposure times are explored to understand how metabolism signaling in plants is coordinated by the presence of sugars.
 
 # Repository Structure
 * Main Script: The main script, "analysis.R", contains the code used to load and process the data, perform differential gene expression analysis, and visualize the results.
