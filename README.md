@@ -36,3 +36,6 @@ Following the DESeq analysis, we proceed with log-fold change shrinkage using lf
 
 Among the Gene Ontology groups, GO:0015979, associated with photosynthesis, stands out as particularly impacted, featuring a substantial alteration in 163 genes. A heatmap visualization distinctly reveals a prevalent downregulation trend among a significant proportion of these genes.
 ![heatmap photosyn](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/ac79bbea-430b-4dc7-885c-f42722a5793a)
+
+Through the use of ShinyGO, it becomes readily apparent that the majority of genes under GO:0015979 are closely associated with coding proteins of both photosystem I and II. 
+![diagrama photo](https://github.com/Bioinformaticareposit/RNA-seq-data-analysis/assets/115641732/df214acb-b5fc-461c-9ccd-e6f8e60f18a8)
