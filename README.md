@@ -24,3 +24,5 @@ The main objective of this analysis is to identify genes whose expression is mod
 Interactive visualization is performed using the GOplot library, allowing detailed exploration of functional enrichment terms and graphical representation of gene expression.
 
 For specific details about the analysis and its interpretation, refer to the main script and comments included in the code.
+
+# Results
